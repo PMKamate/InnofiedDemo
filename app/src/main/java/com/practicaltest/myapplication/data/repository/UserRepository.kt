@@ -48,7 +48,7 @@ class UserRepository @Inject constructor(
 
             }
         }
-        Log.d("Test size: ", "" + restaurantItemList.size)
+        //Log.d("Test size: ", "" + restaurantItemList.size)
         return UserListModel(restaurantItemList)
 
     }
