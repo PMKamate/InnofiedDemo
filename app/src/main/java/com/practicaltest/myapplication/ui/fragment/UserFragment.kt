@@ -1,5 +1,6 @@
 package com.practicaltest.myapplication.ui.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -12,12 +13,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.practicaltest.myapplication.data.entities.UserDataItem
 import com.practicaltest.myapplication.databinding.FragmentUserlistBinding
 import com.practicaltest.myapplication.utils.RecyclerViewLoadMoreScroll
 import com.practicaltest.myapplication.utils.Resource
 import com.practicaltest.myapplication.utils.autoCleared
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 @Suppress("DEPRECATION")
@@ -49,6 +54,7 @@ class UserFragment : Fragment() {
         setAdapter()
         setRVLayoutManager()
         setRVScrollListener()
+        setSwipeRefreshLayout()
     }
 
     private fun setAdapter() {
@@ -92,7 +98,7 @@ class UserFragment : Fragment() {
         getActivity()?.getWindow()?.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         viewModel.getUserDetails(PAGE_START.toString(), per_page).observe(
             viewLifecycleOwner, {
-                // binding.swipeRefresh.isRefreshing = false
+                binding.swipeRefresh.isRefreshing = false
                 when (it.status) {
                     Resource.Status.SUCCESS -> {
                         binding.progressBar.visibility = View.GONE
@@ -107,6 +113,16 @@ class UserFragment : Fragment() {
                 }
             })
 
+    }
+
+    fun setSwipeRefreshLayout() {
+        binding.swipeRefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
+            override fun onRefresh() {
+                binding.swipeRefresh.isRefreshing = true
+                PAGE_START = 1
+                setupObservers()
+            }
+        })
     }
 
     private fun setupObservers1() {
